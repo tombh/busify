@@ -1,6 +1,7 @@
 Busify::Application.routes.draw do
   match 'stops/within' => 'bus_stops#within', :defaults => { :format => 'json' }
   match 'stops/:id' => 'bus_stops#show', :defaults => { :format => 'json' }
+  match 'plan' => 'bus_stops#plan', :defaults => { :format => 'json' }
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
@@ -51,7 +52,7 @@ Busify::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => 'main#index'
+  root :to => 'main#index', :defaults => { :format => 'html' }
 
   # See how all your routes lay out with "rake routes"
 

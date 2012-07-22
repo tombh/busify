@@ -39,6 +39,47 @@
         }
       );
 
+      var from_marker;
+      var to_marker;
+
+      function placeMarker(location) {
+        if ( !from_marker ) {
+          // Create our "tiny" marker icon
+          from_marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            icon: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png",
+            draggable: true
+          });
+          return;
+        }
+
+        if ( !to_marker ) {
+          to_marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            icon: "http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png",
+            draggable: true
+          });
+        }
+
+        $('.plan_handle').click(function(){
+          var from = from_marker.getPosition().$a + ',' + from_marker.getPosition().Za;
+          var to = to_marker.getPosition().$a + ',' + to_marker.getPosition().Za;
+          var url = '/plan?from=' + from + '&to=' + to;
+          $.get(url, function(response){
+            console.log(response);
+          });
+        });
+
+        $('.plan_handle').show();
+
+      }
+
+      google.maps.event.addListener(map, 'click', function(event) {
+        placeMarker(event.latLng);
+      });
+
     }
 
   });

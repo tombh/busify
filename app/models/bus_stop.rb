@@ -17,7 +17,7 @@ class BusStop
       [ bounds[2].to_f,  bounds[3].to_f ]
     ]
     query = {:coordinates.within => {"$box" => box}}
-    only = [:ATCOCode, :coordinates]
+    only = [:ATCOCode, :coordinates, :bus_routes]
   	BusStop.where(query).only(only).limit(100)
   end
 

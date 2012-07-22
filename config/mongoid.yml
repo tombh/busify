@@ -1,6 +1,7 @@
 development:
   host: localhost
   database: busify_development
+  logger: false
 
 test:
   host: localhost
