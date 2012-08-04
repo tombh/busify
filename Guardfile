@@ -16,7 +16,18 @@ guard 'livereload' do
   watch(%r{(app|vendor)/assets/\w+/(.+\.(css|js|html|scss)).*})  { |m| "/assets/#{m[2]}" }
 end
 
-guard 'rails', :port => 3002 do
+guard 'rails', :port => 3002, :server => 'thin' do
   watch('Gemfile.lock')
   watch(%r{^(config)/.*})
+end
+
+### Guard::Sidekiq
+#  available options:
+#  - :verbose
+#  - :queue (defaults to "default")
+#  - :concurrency (defaults to 1)
+#  - :timeout
+#  - :environment (corresponds to RAILS_ENV for the Sidekiq worker)
+guard 'sidekiq', :environment => 'development' do
+  watch(%r{^app/workers/(.+)\.rb$})
 end

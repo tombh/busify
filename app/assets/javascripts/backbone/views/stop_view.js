@@ -9,9 +9,7 @@
     //template: JST["backbone/templates/stops/index"],
                         
     initialize: function(options) {
-
       this.options.stops.on('add', this.addOne, this);
-        
     },
 
     addAll: function() {

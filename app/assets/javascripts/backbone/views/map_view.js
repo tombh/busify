@@ -64,11 +64,14 @@
         }
 
         $('.plan_handle').click(function(){
-          var from = from_marker.getPosition().$a + ',' + from_marker.getPosition().Za;
-          var to = to_marker.getPosition().$a + ',' + to_marker.getPosition().Za;
-          var url = '/plan?from=' + from + '&to=' + to;
-          $.get(url, function(response){
-            console.log(response);
+          var from = from_marker.getPosition().lat() + ',' + from_marker.getPosition().lng();
+          var to = to_marker.getPosition().lat() + ',' + to_marker.getPosition().lng();
+          window.router.navigate('plan', true);
+          self.options.plans.fetch({
+            data: {
+              from: from,
+              to: to
+            }
           });
         });
 

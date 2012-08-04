@@ -8,8 +8,14 @@ gem 'rails', '3.2.3'
 gem 'mongoid'
 gem 'bson_ext'
 gem 'geocoder'
-gem 'activeadmin-mongoid'
 gem 'atco', :path => '/home/tombh/Workspace/atco'
+
+gem 'sidekiq', :path => '/home/tombh/Workspace/sidekiq'
+gem 'slim'
+# if you require 'sinatra' you get the DSL extended to Object
+gem 'sinatra', :require => nil
+
+gem 'websocket-rails'
 
 gem "rails-backbone", :git => 'git://github.com/teleological/backbone-rails.git'
 
@@ -31,6 +37,7 @@ group :development do
   gem 'guard-rails'
   gem 'guard-bundler'
   gem 'guard-livereload'
+  gem 'guard-sidekiq'
   gem 'rails-footnotes'
   gem "capistrano"
 end

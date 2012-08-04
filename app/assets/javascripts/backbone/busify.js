@@ -24,7 +24,7 @@
     // Add the Google Map to the page
     var map = new google.maps.Map(document.getElementById('map_canvas'), settings);
     map.oldCenter = new google.maps.LatLng(45, 0);
-    new Busify.Routers.MapRouter({map: map});
+    window.router = new Busify.Routers.MapRouter({map: map});
     
     Backbone.history.start({pushState: true});
   });

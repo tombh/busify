@@ -14,21 +14,21 @@
 
   Busify.Collections.StopsCollection = Backbone.Collection.extend({
     model: Busify.Models.Stop,
-    url: '/stops/within',
+    url: '/stops',
 
     markers: [],
 
     /**
-     * When the maps boundaries change update the collection
+     * When the map's boundaries change update the collection
      */
     boundsChange: function(bounds){
       this.fetch({
         add: true,
         data : {
-          bl_long: bounds.ea.b,
-          bl_lat: bounds.ca.b,
-          tr_long: bounds.ea.j,
-          tr_lat: bounds.ca.j
+          bl_long: bounds.getSouthWest().lng(),
+          bl_lat: bounds.getSouthWest().lat(),
+          tr_long: bounds.getNorthEast().lng(),
+          tr_lat: bounds.getNorthEast().lat()
         }
       });
     }

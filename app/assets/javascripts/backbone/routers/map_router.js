@@ -4,16 +4,22 @@
 
     initialize: function(options) {
       options.stops = new Busify.Collections.StopsCollection();
+      options.plans = new Busify.Collections.PlansCollection();
       this.options = options;
+      new Busify.Views.Map.IndexView(this.options);
     },
 
     routes: {
-      ".*"       : "index"
+      "" : "index",
+      "plan" : "plan"
     },
 
     index: function() {
-      new Busify.Views.Map.IndexView(this.options);
       new Busify.Views.Stops.StopView(this.options);
+    },
+
+    plan: function() {
+      new Busify.Views.Plans.PlanView(this.options);
     }
 
   });
