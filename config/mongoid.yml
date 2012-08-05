@@ -1,14 +1,22 @@
+options: &options
+  parameterize_keys: true
+  persist_in_safe_mode: true
+  identity_map_enabled: true
+
 development:
+  <<: *options
   host: localhost
   database: busify_development
   logger: false
 
 test:
+  <<: *options
   host: localhost
   database: busify_test
 
 # set these environment variables on your prod server
 production:
+  <<: *options
   host: <%= ENV['MONGOID_HOST'] %>
   port: <%= ENV['MONGOID_PORT'] %>
   username: <%= ENV['MONGOID_USERNAME'] %>

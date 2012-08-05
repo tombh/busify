@@ -48,6 +48,7 @@ namespace :import do
         journey['departures'] << stop['published_departure_time']
       end
       route = {}
+      route['operator'] = journey['operator']
       route['number'] = journey['route_number']
       route['direction'] = journey['route_direction']
       route['stops'] = journey['stop_codes']
@@ -67,24 +68,25 @@ namespace :crunch do
       route.stops.each do |atcocode|
         stop = BusStop.where(:ATCOCode => atcocode).first
 
+
         if stop.nil?
           # puts stop.to_yaml
           next
         end
 
         if stop.bus_routes
-          included = stop.bus_routes.include? route.number
+          included = stop.bus_routes.include? route.keygen
         else
           included = false
           stop.bus_routes = []
         end
 
         if !included
-          stop.bus_routes << route.number
+          stop.bus_routes << route.keygen
           stop.save!
         end
         
-        #puts stop.bus_routes.to_yaml
+        # puts stop.bus_routes.to_yaml
       end
     end 
   end

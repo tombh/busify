@@ -40,4 +40,6 @@ group :development do
   gem 'guard-sidekiq'
   gem 'rails-footnotes'
   gem "capistrano"
+  gem 'rspec'
+  gem 'rspec-rails'
 end

@@ -42,8 +42,8 @@
        * Watch for updates from long-running tasks
        */
       dispatcher.bind(namespace + '.update', function(data) {
-        console.log(data);
         options.success(data);
+        console.log('update', data);
       });
 
       var event_name = namespace + '.' + method;

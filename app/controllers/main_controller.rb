@@ -1,9 +1,7 @@
 class MainController < ApplicationController
-  
-  def home
-    # pass
-  end
 
-    
+  def index
+  	
+  end
   
 end

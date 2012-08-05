@@ -68,6 +68,7 @@
           var to = to_marker.getPosition().lat() + ',' + to_marker.getPosition().lng();
           window.router.navigate('plan', true);
           self.options.plans.fetch({
+            add: true,
             data: {
               from: from,
               to: to
