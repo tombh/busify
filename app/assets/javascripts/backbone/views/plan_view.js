@@ -11,8 +11,6 @@
       this.options.plans.on('add', this.addOne, this);
       this.directionsService = new google.maps.DirectionsService();
       this.directionsDisplay = new google.maps.DirectionsRenderer();
-      this.directionsDisplay.setMap(this.options.map);
-      this.added = false;
 
       var from = this.options.plan.from;
       var to = this.options.plan.to;
@@ -32,26 +30,50 @@
     },
 
     addOne: function(plan) {
-      
-      // Prevent excess hits to the DirectionsService API
-      if(this.added) return;
       console.log('plan added', plan);
-      
-      // Just work on the first match for now
-      var match = plan.get('match')[2];
-
-      function waypoint(latLng){
-        return {
-          location: latLng
-          // don't use 'stopover: false' it jerks some of the waypoint paths
-        };
+      if(this.options.plans.length == 1){
+        this.renderPlan(plan);
       }
+    },
 
+    render: function() {
+      return this;
+    },
+
+
+
+    /**
+     * Render a journey plan onto the map
+     */
+    renderPlan: function(plan){
+      // Just work on the first match for now
+      var bus_journeys = plan.get('match');
+      var batches;
+
+      this.changes = [];
+
+      var self = this;
+      $.each(bus_journeys, function(index, journey){
+        batches = self.createBatches(journey);
+        self.renderJourney(batches);
+      });
+
+      this.renderChanges();
+    },
+
+    /**
+     * Because the Directions API limits the number of waypoints to 8 we need to batch up
+     * all the pieces from a Busify API match.
+     * A 'journey' is a being on a bus without changing.
+     * A 'route' is everything required to get from A to B, maybe including lots of 'journeys'
+     */
+    createBatches: function(journey){
       var batch = {};
-      batch.waypoints = [];
       var batches = [];
       var latLng;
-      $.each(match.stops, function(index, stop){
+      batch.waypoints = [];
+      var self = this;
+      $.each(journey.stops, function(index, stop){
         latLng = new google.maps.LatLng(stop.lat, stop.lng);
         if(batch.waypoints.length === 0){
           if(typeof batch.origin == 'undefined'){
@@ -59,7 +81,7 @@
             batch.origin = latLng;
           }else{
             // Second step of any batch
-            batch.waypoints = [waypoint(latLng)];
+            batch.waypoints = [{location: latLng}];
             batch.travelMode = google.maps.TravelMode.BICYCLING;
           }
         }else if(batch.waypoints.length == 8){
@@ -71,7 +93,7 @@
           batch.origin = latLng;
           batch.waypoints = [];
         }else{
-          batch.waypoints.push(waypoint(latLng));
+          batch.waypoints.push({location: latLng});
         }
       });
 
@@ -83,14 +105,22 @@
         batches.push(batch);
       }
 
-      console.log('batches', batches);
+      self.changes.push(latLng);
 
+      return batches;
+    },
+
+    renderJourney: function(batches){
       var self = this;
       var paths = [];
       var batches_complete = 0;
       $.each(batches, function(batch_index, batch){
         self.directionsService.route(batch, function(response, status) {
           if (status == google.maps.DirectionsStatus.OK) {
+            // TODO Check for quota limit
+            
+            // The Directiosn API returns a deeply nested object.
+            // A lot of drilling to get the honey.
             $.each(response.routes[0].legs, function(leg_index, leg){
               $.each(leg.steps, function(step_index, step){
                 paths = paths.concat(step.lat_lngs);
@@ -100,31 +130,31 @@
             batches_complete += 1;
 
             if(batches_complete == batches.length){
-              console.log("rendering " + paths.length);
               var route = new google.maps.Polyline({
                 path: paths,
-                strokeColor: "#FF0000",
+                strokeColor: '#'+Math.floor(Math.random()*16777215).toString(16),
                 strokeOpacity: 0.5,
                 strokeWeight: 4
               });
 
               route.setMap(self.options.map);
-              //self.directionsDisplay.setDirections(response);
-              self.added = true;
-
             }
           }
         });
       });
-
-      
-
     },
 
-    render: function() {
-      return this;
+    renderChanges: function(){
+      var self = this;
+      $.each(this.changes, function(index, change){
+        new google.maps.Marker({
+          position: change,
+          map: self.options.map,
+          title: index.toString()
+        });
+      });
     }
-
+  
   });
 
 }).call(this);

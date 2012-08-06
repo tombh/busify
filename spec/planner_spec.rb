@@ -7,6 +7,7 @@ describe 'PlannerWorker' do
     # `mongorestore -d busify_test #{RAILS.root}/spec/fixtures/bristol`
     @worker = PlannerWorker.new
   end
+
   describe 'PlannerWorker.flesh_out_match' do
     it 'should flesh out stop details' do
       match = [
@@ -28,4 +29,13 @@ describe 'PlannerWorker' do
       fleshed[1][:stops].last[:name].should eq 'Whitmore Avenue'
     end
   end
+
+  describe 'Planner.perform' do
+    it 'should plan a journey between 2 points' do
+      params = {}
+      params['from'] = '51.47059080879994,-2.6150304933929647'
+      params['to'] = '51.468031084263025,-2.5920171400451864'
+      @worker.perform(params)
+    end
+  end  
 end

@@ -22,8 +22,7 @@ class PlannerWorker
     match.each do |leg|
       fleshed_stops = []
       leg[:stops].each do |stop|
-        if !stops.has_key? stop 
-          p stop
+        if !stops.has_key? stop
           next
         end
         stop_full = stops[stop]
@@ -69,14 +68,14 @@ class PlannerWorker
     return if @searched_routes.include? route
 
     route_stack = Marshal.load(Marshal.dump(route_stack))
-    current_leg = route_stack.last
+    current_leg = route_stack.pop
 
     puts "Searching #{route} at depth #{depth}"    
 
     stops = BusRoute.where(:_id => route).first.stops
     # Slice off the stops from the stops in the last leg of the journey
     # to the end of the route.
-    index = stops.index(route_stack.last[:stops].last)
+    index = stops.index(current_leg[:stops].last)
     stops = stops[(index + 1)..-1]
 
     # Loop through immediate stops on the route
@@ -91,9 +90,19 @@ class PlannerWorker
 
     @searched_routes << Marshal.load(Marshal.dump(route))
 
+    stops_full = BusStop.where(:ATCOCode.in => stops.uniq).to_a
+    stops_full = Hash[stops_full.map!{|s| [s.ATCOCode, s]}]
+    
+    current_leg[:stops] = [current_leg[:stops].shift]
+
     # Recursively search stops in child routes
-    BusStop.where(:ATCOCode.in => stops).each do |stop|
-      
+    stops.each do |stop|
+      stop = stops_full[stop]
+      if stop.nil?
+        p stop
+        next
+      end
+      current_leg[:stops].push(stop.ATCOCode)
       nearbys = BusStop.near(:coordinates => stop.coordinates).limit(5)
       return if nearbys.nil?
       nearbys.each do |nearby|
@@ -103,7 +112,12 @@ class PlannerWorker
             :route => r,
             :stops => [nearby.ATCOCode]
           }
-          destination_in_route? r, route_stack + [next_leg], depth
+          if route_stack.length == 0
+            route_stack_pass = [current_leg] + [next_leg]
+          else
+            route_stack_pass = route_stack + [current_leg] + [next_leg]
+          end
+          destination_in_route? r, route_stack_pass, depth
         end
       end
     end
