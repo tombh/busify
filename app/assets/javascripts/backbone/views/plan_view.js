@@ -12,6 +12,14 @@
       this.directionsService = new google.maps.DirectionsService();
       this.directionsDisplay = new google.maps.DirectionsRenderer();
 
+      this.colours = [
+        '#ff0000',
+        '#00ff00',
+        '#0000ff',
+        '#00ffff',
+        '#000000'
+      ];
+
       var from = this.options.plan.from;
       var to = this.options.plan.to;
       if(from && to){
@@ -132,7 +140,7 @@
             if(batches_complete == batches.length){
               var route = new google.maps.Polyline({
                 path: paths,
-                strokeColor: '#'+Math.floor(Math.random()*16777215).toString(16),
+                strokeColor: self.colours.shift(),
                 strokeOpacity: 0.5,
                 strokeWeight: 4
               });
