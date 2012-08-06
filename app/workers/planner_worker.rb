@@ -75,9 +75,9 @@ class PlannerWorker
 
     stops = BusRoute.where(:_id => route).first.stops
     # Slice off the stops from the stops in the last leg of the journey
-    # to the end of the route
+    # to the end of the route.
     index = stops.index(route_stack.last[:stops].last)
-    stops = stops[index..-1]
+    stops = stops[(index + 1)..-1]
 
     # Loop through immediate stops on the route
     stops.each do |stop|

@@ -11,14 +11,17 @@
 
     routes: {
       "" : "index",
-      "plan" : "plan"
+      "plan/:from/:to" : "plan"
     },
 
     index: function() {
       new Busify.Views.Stops.StopView(this.options);
     },
 
-    plan: function() {
+    plan: function(from, to) {
+      this.options.plan = {};
+      this.options.plan.from = from;
+      this.options.plan.to = to;
       new Busify.Views.Plans.PlanView(this.options);
     }
 

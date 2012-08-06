@@ -66,14 +66,7 @@
         $('.plan_handle').click(function(){
           var from = from_marker.getPosition().lat() + ',' + from_marker.getPosition().lng();
           var to = to_marker.getPosition().lat() + ',' + to_marker.getPosition().lng();
-          window.router.navigate('plan', true);
-          self.options.plans.fetch({
-            add: true,
-            data: {
-              from: from,
-              to: to
-            }
-          });
+          window.router.navigate('plan/' + from + '/' + to, true);
         });
 
         $('.plan_handle').show();
