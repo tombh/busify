@@ -9,9 +9,13 @@ class PlannerController < WebsocketRails::BaseController
     PlannerWorker.perform_async(message) do |msg|
       if msg[Sidekiq::TASK_COMPLETE_SIG]
         send_message :complete, true, :namespace => 'plan'
+        puts msg
       else
+        puts msg
         send_message :update, msg, :namespace => 'plan'
       end
     end
+
+    puts "outside"
   end
 end

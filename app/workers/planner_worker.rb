@@ -4,7 +4,7 @@ class PlannerWorker
 
   def initialize
     @searched_routes = []
-    @matches = []
+    @matches = 0
   end
 
   def flesh_out_match match 
@@ -45,6 +45,8 @@ class PlannerWorker
   def match match
 
     puts "Match found!"
+
+    @matches += 1
     
     match = flesh_out_match match
 
@@ -98,10 +100,13 @@ class PlannerWorker
     # Recursively search stops in child routes
     stops.each do |stop|
       stop = stops_full[stop]
+      
       if stop.nil?
-        p stop
+        # why does this happen!?
+        # p stop
         next
       end
+      
       current_leg[:stops].push(stop.ATCOCode)
       nearbys = BusStop.near(:coordinates => stop.coordinates).limit(5)
       return if nearbys.nil?
@@ -124,27 +129,44 @@ class PlannerWorker
   end
 
   def perform params
+
     @start_time = Time.now
 
     # TODO Use n nearest stops to from/to coords?
 
 
     coords = params['from'].split(',')
-    @from = BusStop.near(:coordinates => [coords[1].to_f, coords[0].to_f]).first
+    froms = BusStop.near(:coordinates => [coords[1].to_f, coords[0].to_f]).limit(3)
     coords = params['to'].split(',')
-    @to = BusStop.near(:coordinates => [coords[1].to_f, coords[0].to_f]).first
+    tos = BusStop.near(:coordinates => [coords[1].to_f, coords[0].to_f]).limit(3)
 
-    @destination = @to.ATCOCode
+    tos.each do |to|
+      froms.each do |from|
+        return if @matches > 0
 
-    # Find all the routes serving the from-stop
-    @from.bus_routes.each do |route|
+        @searched_routes = []
+        
+        @from = from
+        @to = to
 
-      route_stack = [{
-        :route => route,
-        :stops => [@from.ATCOCode]
-      }]
-      # Look at all the stops on each route
-      destination_in_route? route, route_stack
+        @destination = @to.ATCOCode
+
+        if @from.bus_routes.nil?
+          p "From stop, '#{@from.ATCOCode}' doesn't have any bus routes!"
+          next
+        end
+
+        # Find all the routes serving the from-stop
+        @from.bus_routes.each do |route|
+
+          route_stack = [{
+            :route => route,
+            :stops => [@from.ATCOCode]
+          }]
+          # Look at all the stops on each route
+          destination_in_route? route, route_stack
+        end
+      end
     end    
   end  
 
